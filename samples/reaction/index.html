@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reaction Test</title>
+<style>
+  html, body { margin: 0; height: 100%; font-family: system-ui, sans-serif; color: #fff; user-select: none; }
+  #pad { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: background .1s; }
+  h1 { margin: 0 0 8px; font-size: clamp(28px, 6vw, 56px); }
+  p { margin: 0; opacity: .85; }
+</style>
+</head>
+<body>
+<div id="pad" style="background:#2563eb"><h1>Reaction Test</h1><p>Click to start</p></div>
+<script>
+const pad = document.getElementById('pad'), h = pad.querySelector('h1'), p = pad.querySelector('p');
+let state = 'idle', t0 = 0, wait, best = Infinity;
+function show(bg, title, sub) { pad.style.background = bg; h.textContent = title; p.textContent = sub; }
+pad.addEventListener('pointerdown', () => {
+  if (state === 'idle' || state === 'result') {
+    state = 'waiting'; show('#b91c1c', 'Wait for green…', '');
+    wait = setTimeout(() => { state = 'go'; t0 = performance.now(); show('#16a34a', 'CLICK!', ''); }, 1000 + Math.random() * 2500);
+  } else if (state === 'waiting') {
+    clearTimeout(wait); state = 'result'; show('#ea580c', 'Too soon!', 'Click to try again');
+  } else if (state === 'go') {
+    const ms = Math.round(performance.now() - t0); best = Math.min(best, ms);
+    state = 'result'; show('#2563eb', `${ms} ms`, `Best: ${best} ms · click to go again`);
+  }
+});
+</script>
+</body>
+</html>

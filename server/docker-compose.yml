@@ -1,0 +1,47 @@
+# Local development dependencies for the OpenArcade API.
+#   docker compose up -d
+# Postgres  -> localhost:5432 (openarcade / openarcade)
+# Keycloak  -> http://localhost:8080 (console: admin / admin; realm "openarcade" is imported on first start)
+# Samples   -> http://localhost:8090 (two tiny games on a different origin, used by the dev seed)
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: openarcade
+      POSTGRES_PASSWORD: openarcade
+      POSTGRES_DB: openarcade
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openarcade"]
+      interval: 5s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.4
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: openarcade
+      KC_DB_PASSWORD: openarcade
+      KC_HOSTNAME: http://localhost:8080
+    ports: ["8080:8080"]
+    volumes:
+      - ./keycloak/openarcade-realm.json:/opt/keycloak/data/import/openarcade-realm.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  sample-games:
+    image: nginx:1.27-alpine
+    ports: ["8090:80"]
+    volumes:
+      - ../samples:/usr/share/nginx/html:ro
+
+volumes:
+  pgdata:

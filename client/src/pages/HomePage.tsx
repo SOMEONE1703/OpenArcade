@@ -20,21 +20,25 @@ export function HomePage() {
 
   return (
     <>
-      <div className="filters">
-        <input
-          type="search"
-          placeholder="Search games"
-          defaultValue={q}
-          onKeyDown={(e) => e.key === 'Enter' && setParam('q', e.currentTarget.value.trim())}
-          aria-label="Search games"
-        />
-        <div className="chips">
-          <button className={!tag ? 'chip active' : 'chip'} onClick={() => setParam('tag')}>All</button>
-          {tags.data?.map((t) => (
-            <button key={t} className={tag === t ? 'chip active' : 'chip'} onClick={() => setParam('tag', t)}>{t}</button>
-          ))}
+      <section className="hero">
+        <h1>Play something new</h1>
+        <p className="muted">Browser games from independent studios, free to play right here.</p>
+          <div className="filters">
+          <input
+            type="search"
+            placeholder="Search games"
+            defaultValue={q}
+            onKeyDown={(e) => e.key === 'Enter' && setParam('q', e.currentTarget.value.trim())}
+            aria-label="Search games"
+          />
+          <div className="chips">
+            <button className={!tag ? 'chip active' : 'chip'} onClick={() => setParam('tag')}>All</button>
+            {tags.data?.map((t) => (
+              <button key={t} className={tag === t ? 'chip active' : 'chip'} onClick={() => setParam('tag', t)}>{t}</button>
+            ))}
         </div>
-      </div>
+        </div>
+      </section>
 
       {q ? (
         <Shelf title={`Results for "${q}"`} sort="new" tag={tag} q={q} />
@@ -62,7 +66,7 @@ function Shelf({ title, sort, tag, q }: { title: string; sort: GameSort; tag?: s
       <h2>{title}</h2>
       {games.isLoading && <p className="muted">Loading…</p>}
       {games.error && <p className="error">Couldn't load games: {games.error.message}</p>}
-      {games.data && <GameGrid games={games.data} />}
+      {games.data && <GameGrid games={games.data} scroll={!q} />}
     </section>
   )
 }

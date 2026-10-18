@@ -10,16 +10,17 @@ export function GameCard({ game }: { game: GameSummary }) {
       <div className="card-body">
         <strong>{game.title}</strong>
         <span className="muted">{game.studio}</span>
-        <span className="muted small">
-          {game.likePercent != null ? `${game.likePercent}% liked · ` : ''}
-          {game.playCount.toLocaleString()} plays
+        <span className="card-stats small muted">
+          {game.likePercent != null && <span className="good">▲ {game.likePercent}%</span>}
+          <span>{game.playCount.toLocaleString()} plays</span>
         </span>
       </div>
     </Link>
   )
 }
 
-export function GameGrid({ games }: { games: GameSummary[] }) {
+/** `scroll` lays the cards out as one sideways-scrolling row, used for the home page shelves. */
+export function GameGrid({ games, scroll = false }: { games: GameSummary[]; scroll?: boolean }) {
   if (games.length === 0) return <p className="muted">No games here yet.</p>
-  return <div className="grid">{games.map((g) => <GameCard key={g.id} game={g} />)}</div>
+  return <div className={scroll ? 'grid scroll' : 'grid'}>{games.map((g) => <GameCard key={g.id} game={g} />)}</div>
 }

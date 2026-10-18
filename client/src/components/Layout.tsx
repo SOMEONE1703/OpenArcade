@@ -23,7 +23,10 @@ function Header() {
   return (
     <header className="header">
       <div className="container header-inner">
-        <Link to="/" className="brand">OpenArcade</Link>
+        <Link to="/" className="brand">
+          <span className="brand-mark" aria-hidden="true">▶</span>
+          <span className="brand-name">OpenArcade</span>
+        </Link>
         <nav className="nav">
           <NavLink to="/" end>Games</NavLink>
           {me.data && <NavLink to="/publish">Publish</NavLink>}

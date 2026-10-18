@@ -3,6 +3,8 @@
 # Postgres  -> localhost:5432 (openarcade / openarcade)
 # Keycloak  -> http://localhost:8080 (console: admin / admin; realm "openarcade" is imported on first start)
 # Samples   -> http://localhost:8090 (two tiny games on a different origin, used by the dev seed)
+name: openarcade
+
 services:
   postgres:
     image: postgres:17

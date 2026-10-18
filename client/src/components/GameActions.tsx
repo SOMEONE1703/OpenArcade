@@ -35,7 +35,7 @@ export function GameActions({ game }: { game: GameDetail }) {
         onClick={() => requireSignIn(() => vote.mutate(game.myVote === 'dislike' ? null : 'dislike'))}
       >👎 {game.dislikeCount.toLocaleString()}</button>
       <span className="muted small">
-        {game.likePercent != null ? `${game.likePercent}% liked, ${total.toLocaleString()} votes` : 'No votes yet'}
+        {game.likePercent != null ? `${game.likePercent}% liked, ${total.toLocaleString()} ${total === 1 ? 'vote' : 'votes'}` : 'No votes yet'}
       </span>
       <button
         className={`btn ghost ${game.isFavorite ? 'active' : ''}`}

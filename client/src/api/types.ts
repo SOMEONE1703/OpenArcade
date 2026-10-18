@@ -1,4 +1,5 @@
-// Mirrors server/src/OpenArcade.Api/Endpoints/Dtos.cs. Can be replaced by types generated from /openapi/v1.json.
+// Mirrors the response records under server/src/Presentation/OpenArcade.Api/Features/*/V1. Can be replaced by
+// types generated from /openapi/v1.json.
 
 export interface GameSummary {
   id: string

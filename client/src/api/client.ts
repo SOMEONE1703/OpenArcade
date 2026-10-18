@@ -56,42 +56,42 @@ function createApi(token?: string) {
   return {
     games: (params: { sort?: GameSort; tag?: string; q?: string; limit?: number } = {}) => {
       const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v != null && v !== '').map(([k, v]) => [k, String(v)]))
-      return get<GameSummary[]>(`/api/games?${qs}`)
+      return get<GameSummary[]>(`/api/v1/games?${qs}`)
     },
-    tags: () => get<string[]>('/api/games/tags'),
-    game: (slug: string) => get<GameDetail>(`/api/games/${slug}`),
-    recordPlay: (slug: string) => send<{ counted: boolean }>('POST', `/api/games/${slug}/plays`),
+    tags: () => get<string[]>('/api/v1/games/tags'),
+    game: (slug: string) => get<GameDetail>(`/api/v1/games/${slug}`),
+    recordPlay: (slug: string) => send<{ counted: boolean }>('POST', `/api/v1/games/${slug}/plays`),
     vote: (slug: string, value: 'like' | 'dislike' | null) =>
-      value ? send<VoteCounts>('PUT', `/api/games/${slug}/vote`, { value }) : send<VoteCounts>('DELETE', `/api/games/${slug}/vote`),
-    favorite: (slug: string, on: boolean) => send<void>(on ? 'PUT' : 'DELETE', `/api/games/${slug}/favorite`),
-    reportGame: (slug: string, reason: string) => send<void>('POST', `/api/games/${slug}/reports`, { reason }),
+      value ? send<VoteCounts>('PUT', `/api/v1/games/${slug}/vote`, { value }) : send<VoteCounts>('DELETE', `/api/v1/games/${slug}/vote`),
+    favorite: (slug: string, on: boolean) => send<void>(on ? 'PUT' : 'DELETE', `/api/v1/games/${slug}/favorite`),
+    reportGame: (slug: string, reason: string) => send<void>('POST', `/api/v1/games/${slug}/reports`, { reason }),
 
-    comments: (slug: string, sort: 'new' | 'top') => get<CommentPage>(`/api/games/${slug}/comments?sort=${sort}`),
-    replies: (id: string) => get<Comment[]>(`/api/comments/${id}/replies`),
+    comments: (slug: string, sort: 'new' | 'top') => get<CommentPage>(`/api/v1/games/${slug}/comments?sort=${sort}`),
+    replies: (id: string) => get<Comment[]>(`/api/v1/comments/${id}/replies`),
     postComment: (slug: string, body: string, parentId?: string) =>
-      send<Comment>('POST', `/api/games/${slug}/comments`, { body, parentId }),
-    deleteComment: (id: string) => send<void>('DELETE', `/api/comments/${id}`),
-    likeComment: (id: string, on: boolean) => send<void>(on ? 'PUT' : 'DELETE', `/api/comments/${id}/like`),
-    pinComment: (id: string) => send<void>('POST', `/api/comments/${id}/pin`),
-    hideComment: (id: string) => send<void>('POST', `/api/comments/${id}/hide`),
-    reportComment: (id: string, reason: string) => send<void>('POST', `/api/comments/${id}/reports`, { reason }),
+      send<Comment>('POST', `/api/v1/games/${slug}/comments`, { body, parentId }),
+    deleteComment: (id: string) => send<void>('DELETE', `/api/v1/comments/${id}`),
+    likeComment: (id: string, on: boolean) => send<void>(on ? 'PUT' : 'DELETE', `/api/v1/comments/${id}/like`),
+    pinComment: (id: string) => send<void>('POST', `/api/v1/comments/${id}/pin`),
+    hideComment: (id: string) => send<void>('POST', `/api/v1/comments/${id}/hide`),
+    reportComment: (id: string, reason: string) => send<void>('POST', `/api/v1/comments/${id}/reports`, { reason }),
 
-    me: () => get<Me>('/api/me'),
-    profile: (username: string) => get<Profile>(`/api/users/${username}`),
+    me: () => get<Me>('/api/v1/me'),
+    profile: (username: string) => get<Profile>(`/api/v1/users/${username}`),
     applyAsPublisher: (studioName: string, links: string[]) =>
-      send<void>('POST', '/api/me/publisher-request', { studioName, links }),
+      send<void>('POST', '/api/v1/me/publisher-request', { studioName, links }),
 
-    myGames: () => get<PublisherGame[]>('/api/publisher/games'),
-    createGame: (game: UpsertGame) => send<PublisherGame>('POST', '/api/publisher/games', game),
-    verifyDomain: (id: string) => send<{ verified: boolean; instructions: string }>('POST', `/api/publisher/games/${id}/verify-domain`),
-    checkEmbed: (id: string) => send<{ allowed: boolean; detail: string }>('POST', `/api/publisher/games/${id}/check-embed`),
-    submitGame: (id: string) => send<PublisherGame>('POST', `/api/publisher/games/${id}/submit`),
+    myGames: () => get<PublisherGame[]>('/api/v1/publisher/games'),
+    createGame: (game: UpsertGame) => send<PublisherGame>('POST', '/api/v1/publisher/games', game),
+    verifyDomain: (id: string) => send<{ verified: boolean; instructions: string }>('POST', `/api/v1/publisher/games/${id}/verify-domain`),
+    checkEmbed: (id: string) => send<{ allowed: boolean; detail: string }>('POST', `/api/v1/publisher/games/${id}/check-embed`),
+    submitGame: (id: string) => send<PublisherGame>('POST', `/api/v1/publisher/games/${id}/submit`),
 
-    reviewQueue: () => get<{ id: string; slug: string; title: string; playUrl: string; studio: string }[]>('/api/admin/review-queue'),
-    publisherRequests: () => get<{ id: string; username: string; studioName: string; links: string[] }[]>('/api/admin/publisher-requests'),
+    reviewQueue: () => get<{ id: string; slug: string; title: string; playUrl: string; studio: string }[]>('/api/v1/admin/review-queue'),
+    publisherRequests: () => get<{ id: string; username: string; studioName: string; links: string[] }[]>('/api/v1/admin/publisher-requests'),
     reviewPublisher: (id: string, approve: boolean) =>
-      send<void>('POST', `/api/admin/publisher-requests/${id}/${approve ? 'approve' : 'reject'}`),
-    reviewGame: (id: string, action: 'approve' | 'reject' | 'delist') => send<void>('POST', `/api/admin/games/${id}/${action}`),
+      send<void>('POST', `/api/v1/admin/publisher-requests/${id}/${approve ? 'approve' : 'reject'}`),
+    reviewGame: (id: string, action: 'approve' | 'reject' | 'delist') => send<void>('POST', `/api/v1/admin/games/${id}/${action}`),
   }
 }
 

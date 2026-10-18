@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Mappers in Infrastructure rebuild entities from database records through internal setters. -->
+    <InternalsVisibleTo Include="OpenArcade.Infrastructure" />
+  </ItemGroup>
+
+</Project>

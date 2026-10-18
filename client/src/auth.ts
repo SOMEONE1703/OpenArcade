@@ -11,9 +11,5 @@ export const oidcConfig: AuthProviderProps = {
   scope: 'openid profile email',
   userStore: new WebStorageStateStore({ store: window.localStorage }),
   automaticSilentRenew: true,
-  onSigninCallback: (user) => {
-    // Return to the page the sign-in started from, and drop ?code=&state= from the URL.
-    const returnTo = (user?.state as { returnTo?: string } | undefined)?.returnTo ?? '/'
-    window.history.replaceState({}, document.title, returnTo)
-  },
+  // AuthCallbackPage sends the player back to where sign-in started, through React Router.
 }

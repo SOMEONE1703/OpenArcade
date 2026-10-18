@@ -6,7 +6,7 @@ publisher's domain. OpenArcade never serves game code.
 
 | Folder     | What it is |
 |------------|------------|
-| `server/`  | C# ASP.NET Core API (.NET 10, EF Core + PostgreSQL, Hangfire, Keycloak JWT auth), plus Docker Compose for Postgres and Keycloak |
+| `server/`  | C# ASP.NET Core API (.NET 10) in Domain, Infrastructure and Presentation projects, with EF Core + PostgreSQL, Hangfire and Keycloak JWT auth, plus Docker Compose for Postgres and Keycloak. See `server/README.md` |
 | `client/`  | React + TypeScript web app (Vite, React Router, TanStack Query, react-oidc-context) |
 | `samples/` | Two tiny games served from a separate origin in development so the play page works end to end |
 
@@ -20,7 +20,7 @@ cd server
 docker compose up -d
 
 # 2. API on http://localhost:5080 (applies migrations and seeds the two sample games in Development)
-dotnet run --project src/OpenArcade.Api
+dotnet run --project src/Presentation/OpenArcade.Api
 
 # 3. Web app on http://localhost:5173 (proxies /api to the API)
 cd ../client
@@ -36,7 +36,7 @@ Open http://localhost:5173. Dev accounts in the `openarcade` realm (local only):
 | `player` | `player` | player |
 
 You can also register a new account from the sign-in page. The Keycloak admin console is at
-http://localhost:8080 (admin / admin). Other useful URLs: OpenAPI at http://localhost:5080/openapi/v1.json and the
+http://localhost:8080 (admin / admin). The API is versioned under `/api/v1`. Other useful URLs: OpenAPI at http://localhost:5080/openapi/v1.json and the
 Hangfire dashboard at http://localhost:5080/hangfire.
 
 ### Google and Discord sign-in

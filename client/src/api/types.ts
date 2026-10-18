@@ -92,6 +92,43 @@ export interface PublisherGame {
   mobileFriendly: boolean
 }
 
+export type GameStatus = 'Draft' | 'InReview' | 'Listed' | 'Hidden' | 'Delisted' | 'Archived'
+
+/** A row in the admin's list of every game. */
+export interface AdminGameRow {
+  id: string
+  slug: string
+  title: string
+  thumbnailUrl: string | null
+  studio: string
+  status: GameStatus
+  playUrl: string
+  domain: string
+  domainVerified: boolean
+  playCount: number
+  likeCount: number
+  dislikeCount: number
+  consecutiveHealthFailures: number
+  createdAt: string
+}
+
+export interface AdminGame extends Omit<AdminGameRow, 'studio'> {
+  description: string
+  tags: string[]
+  mobileFriendly: boolean
+  screenshots: string[]
+}
+
+/** The catalog details an admin can edit. Slug and play URL stay with the publisher. */
+export interface EditGameDetails {
+  title: string
+  description: string
+  tags: string[]
+  thumbnailUrl?: string
+  screenshots: string[]
+  mobileFriendly: boolean
+}
+
 export interface UpsertGame {
   slug: string
   title: string

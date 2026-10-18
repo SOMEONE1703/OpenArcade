@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useApi } from '../api/client'
 import { useMe } from '../hooks'
+import { AdminGames } from '../components/AdminGames'
 
-/** Admin queue: publisher requests and games waiting for review. Reports and bans are API-only for now. */
+/** Admin queue: publisher requests, games waiting for review, and every game in the catalog. Reports and bans are API-only for now. */
 export function AdminPage() {
   const me = useMe()
   const api = useApi()
@@ -51,6 +52,8 @@ export function AdminPage() {
           </div>
         </div>
       ))}
+
+      <AdminGames />
     </>
   )
 }

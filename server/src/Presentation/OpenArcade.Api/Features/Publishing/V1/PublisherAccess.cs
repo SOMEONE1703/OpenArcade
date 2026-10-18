@@ -22,6 +22,9 @@ internal static class PublisherAccess
         if (publisher.Error is { } error) return error;
 
         var game = await games.GetAsync(gameId, ct);
-        return game is not null && game.PublisherId == publisher.Value!.Id ? game : Error.NotFound();
+        // An archived game was removed by an admin, so it's gone for the publisher too.
+        return game is not null && game.PublisherId == publisher.Value!.Id && game.Status != GameStatus.Archived
+            ? game
+            : Error.NotFound();
     }
 }

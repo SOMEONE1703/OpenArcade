@@ -13,6 +13,6 @@ public sealed class ListMyGamesHandler(IGameRepository games, IPublisherReposito
         if (publisher.Error is { } error) return error;
 
         var mine = await games.ListByPublisherAsync(publisher.Value!.Id, ct);
-        return mine.Select(PublisherGameResponse.From).ToList();
+        return mine.Where(g => g.Status != GameStatus.Archived).Select(PublisherGameResponse.From).ToList();
     }
 }

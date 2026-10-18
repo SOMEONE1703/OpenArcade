@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import { useAuth } from 'react-oidc-context'
 import type {
-  Comment, CommentPage, GameDetail, GameSort, GameSummary, Me, Profile, PublisherGame, UpsertGame, VoteCounts,
+  AdminGame, AdminGameRow, Comment, CommentPage, EditGameDetails, GameDetail, GameSort, GameStatus, GameSummary, Me,
+  Profile, PublisherGame, UpsertGame, VoteCounts,
 } from './types'
 
 export class ApiError extends Error {
@@ -92,6 +93,14 @@ function createApi(token?: string) {
     reviewPublisher: (id: string, approve: boolean) =>
       send<void>('POST', `/api/v1/admin/publisher-requests/${id}/${approve ? 'approve' : 'reject'}`),
     reviewGame: (id: string, action: 'approve' | 'reject' | 'delist') => send<void>('POST', `/api/v1/admin/games/${id}/${action}`),
+    adminGames: (params: { status?: GameStatus; q?: string } = {}) => {
+      const qs = new URLSearchParams(Object.entries(params).filter(([, v]) => v).map(([k, v]) => [k, String(v)]))
+      return get<AdminGameRow[]>(`/api/v1/admin/games?${qs}`)
+    },
+    adminGame: (id: string) => get<AdminGame>(`/api/v1/admin/games/${id}`),
+    editGameDetails: (id: string, details: EditGameDetails) => send<AdminGame>('PUT', `/api/v1/admin/games/${id}`, details),
+    setGameState: (id: string, action: 'delist' | 'relist' | 'archive' | 'restore') =>
+      send<void>('POST', `/api/v1/admin/games/${id}/${action}`),
   }
 }
 

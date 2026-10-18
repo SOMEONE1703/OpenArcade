@@ -47,6 +47,8 @@ internal sealed class GameRepository(AppDbContext db) : IGameRepository
         {
             db.GameMedia.RemoveRange(record.Media);
             record.Media = game.Media.Select(m => m.ToRecord(game.Id)).ToList();
+            // Add explicitly: the new records already have ids, so EF would otherwise treat them as existing rows.
+            db.GameMedia.AddRange(record.Media);
         }
     }
 
@@ -91,6 +93,22 @@ internal sealed class GameRepository(AppDbContext db) : IGameRepository
             .OrderBy(g => g.CreatedAt)
             .Select(g => new ReviewQueueItem(g.Id, g.Slug, g.Title, g.PlayUrl, g.Domain, g.Publisher.StudioName, g.DomainVerifiedAt))
             .ToListAsync(ct);
+
+    public async Task<IReadOnlyList<AdminGameRow>> ListForAdminAsync(AdminGameQuery query, CancellationToken ct)
+    {
+        var q = db.Games.AsNoTracking();
+        q = query.Status is { } status ? q.Where(g => g.Status == status) : q.Where(g => g.Status != GameStatus.Archived);
+        if (!string.IsNullOrWhiteSpace(query.Search))
+            q = q.Where(g => EF.Functions.ILike(g.Title, $"%{query.Search}%") || EF.Functions.ILike(g.Slug, $"%{query.Search}%")
+                || EF.Functions.ILike(g.Publisher.StudioName, $"%{query.Search}%"));
+
+        return await q.OrderByDescending(g => g.CreatedAt).Take(query.Limit)
+            .Select(g => new AdminGameRow(
+                g.Id, g.Slug, g.Title, g.Media.Where(m => m.Kind == MediaKind.Thumbnail).Select(m => m.Url).FirstOrDefault(),
+                g.Publisher.StudioName, g.Status, g.PlayUrl, g.Domain, g.DomainVerifiedAt != null, g.PlayCount, g.LikeCount,
+                g.DislikeCount, g.ConsecutiveHealthFailures, g.CreatedAt))
+            .ToListAsync(ct);
+    }
 }
 
 internal sealed class PlayRepository(AppDbContext db) : IPlayRepository

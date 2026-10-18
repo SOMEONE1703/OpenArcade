@@ -3,7 +3,9 @@ using OpenArcade.Domain.Common;
 
 namespace OpenArcade.Domain.Games;
 
-public enum GameStatus { Draft, InReview, Listed, Hidden, Delisted }
+/// <remarks>Archived is an admin soft delete: the game disappears everywhere, including the publisher's list, but its
+/// data is kept so it can be restored.</remarks>
+public enum GameStatus { Draft, InReview, Listed, Hidden, Delisted, Archived }
 public enum MediaKind { Thumbnail, Screenshot, Video }
 
 public sealed record GameMedia(MediaKind Kind, string Url, int SortOrder);
@@ -101,7 +103,43 @@ public sealed partial class Game
     }
 
     /// <summary>Kill switch: removes the play page immediately.</summary>
-    public void Delist() => Status = GameStatus.Delisted;
+    public void Delist()
+    {
+        if (Status == GameStatus.Archived) throw new DomainRuleException("The game is Archived.");
+        Status = GameStatus.Delisted;
+    }
+
+    /// <summary>Puts a delisted game back in the catalog.</summary>
+    public void Relist()
+    {
+        if (Status != GameStatus.Delisted) throw new DomainRuleException($"The game is {Status}.");
+        if (!IsDomainVerified) throw new DomainRuleException("The domain isn't verified, so the game can't be listed.");
+        Status = GameStatus.Listed;
+        ConsecutiveHealthFailures = 0;
+    }
+
+    /// <summary>Soft delete. Only a delisted game can be archived, so removing a live game is always two steps.</summary>
+    public void Archive()
+    {
+        if (Status != GameStatus.Delisted) throw new DomainRuleException("Take the game offline before removing it.");
+        Status = GameStatus.Archived;
+    }
+
+    /// <summary>Brings an archived game back as delisted, so an admin can check it before relisting.</summary>
+    public void Restore()
+    {
+        if (Status != GameStatus.Archived) throw new DomainRuleException($"The game is {Status}.");
+        Status = GameStatus.Delisted;
+    }
+
+    /// <summary>
+    /// An admin edit of the catalog details. The slug and play URL stay with the publisher, so the game keeps its
+    /// status and doesn't go back to review.
+    /// </summary>
+    public void EditCatalogDetails(
+        string title, string description, IReadOnlyList<string> tags, bool mobileFriendly, string? thumbnailUrl,
+        IReadOnlyList<string> screenshots) =>
+        Apply(new GameListing(Slug, title, description, tags, PlayUrl, mobileFriendly, thumbnailUrl, screenshots));
 
     /// <summary>
     /// Applies a daily health check. Three failures in a row hide a listed game; a hidden game that passes again

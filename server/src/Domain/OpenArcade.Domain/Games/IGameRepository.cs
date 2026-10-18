@@ -13,6 +13,15 @@ public sealed record GameCard(
 public sealed record ReviewQueueItem(
     Guid Id, string Slug, string Title, string PlayUrl, string Domain, string Studio, DateTimeOffset? DomainVerifiedAt);
 
+/// <summary>Filters for the admin's list of every game. Archived games only show when asked for by status.</summary>
+public sealed record AdminGameQuery(GameStatus? Status, string? Search, int Limit);
+
+/// <summary>A game of any status, as an admin sees it in the games list.</summary>
+public sealed record AdminGameRow(
+    Guid Id, string Slug, string Title, string? ThumbnailUrl, string Studio, GameStatus Status, string PlayUrl,
+    string Domain, bool DomainVerified, int PlayCount, int LikeCount, int DislikeCount, int ConsecutiveHealthFailures,
+    DateTimeOffset CreatedAt);
+
 public interface IGameRepository
 {
     Task<Game?> GetAsync(Guid id, CancellationToken ct = default);
@@ -28,6 +37,7 @@ public interface IGameRepository
     Task<IReadOnlyList<string>> ListTagsAsync(CancellationToken ct = default);
     Task<IReadOnlyList<GameCard>> ListFavoritesAsync(Guid userId, CancellationToken ct = default);
     Task<IReadOnlyList<ReviewQueueItem>> ListReviewQueueAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<AdminGameRow>> ListForAdminAsync(AdminGameQuery query, CancellationToken ct = default);
 }
 
 public interface IPlayRepository
